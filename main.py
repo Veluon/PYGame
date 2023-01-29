@@ -40,6 +40,25 @@ def main():
         def update(self):
             self.rect = self.rect
 
+    class Point(pygame.sprite.Sprite):
+        def __init__(self, x, y):
+            pygame.sprite.Sprite.__init__(self)
+            self.image = pygame.Surface((32, 32))
+            self.image = load_image("data/sprites/int_objects/point.jpg")
+            self.rect = self.image.get_rect()
+            self.rect.x = x
+            self.rect.y = y
+            self.active = False
+
+        def update(self):
+            self.rect = self.rect
+            if self.active is False:
+                self.image = load_image("data/sprites/int_objects/point.jpg")
+            else:
+                self.image = load_image("data/sprites/int_objects/complete_point.jpg")
+            if pygame.sprite.spritecollideany(self, character_group):
+                self.active = True
+
     class Board:
         # создание поля
         def __init__(self, board_load):
@@ -71,11 +90,10 @@ def main():
                                                    "data/sprites/objects/floor1.jpg")
                         all_sprites.add(create_obj)
 
-                    elif self.board[h][w] == "W":
-                        pygame.draw.rect(arg, "yellow", (self.left + w * self.cell_size,
-                                                         self.top + h * self.cell_size,
-                                                         self.cell_size,
-                                                         self.cell_size), 1)
+                    elif self.board[h][w] == "P":
+                        create_obj = Point(self.left + w * self.cell_size, self.top + h * self.cell_size)
+                        all_sprites.add(create_obj)
+                        points.add(create_obj)
                     elif self.board[h][w] == "S":
                         pygame.draw.rect(arg, "blue", (self.left + w * self.cell_size,
                                                        self.top + h * self.cell_size,
@@ -86,7 +104,7 @@ def main():
 
         def __init__(self):
             super().__init__()
-            self.image = pygame.Surface((32, 32))
+            self.image = pygame.Surface((30, 30))
             self.image = load_image("data/sprites/character/character_up.png")
             self.rect = self.image.get_rect()
             self.rect.x = 4 * 32
@@ -121,6 +139,7 @@ def main():
                 if pygame.sprite.spritecollideany(self, collide_sprites):
                     self.rect.x -= self.v
 
+
     # поле
     board_log = [[0] * 32 for _ in range(18)]
     board = Board(board_log)
@@ -128,6 +147,7 @@ def main():
     # группа, содержащая все спрайты
     collide_sprites = pygame.sprite.Group()
     all_sprites = pygame.sprite.Group()
+    points = pygame.sprite.Group()
     character_group = pygame.sprite.Group()
     character = MainCharacter()
     character_group.add(character)
